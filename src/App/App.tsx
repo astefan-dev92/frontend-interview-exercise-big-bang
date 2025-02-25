@@ -1,24 +1,41 @@
-import automataLogo from '../assets/automata.png'
-import './App.css'
+import { Box } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
-import { Box, Button } from '@mui/material'
+import { Welcome } from "./features/welcome";
+import { Rules } from "./features/rules";
+import { Scoreboard } from "./features/scoreboard";
+import { GameArea } from "./features/game-area";
+
+import automataLogo from "../assets/automata.png";
+import "./App.css";
 
 function App() {
   return (
-    <>
-      <div>
-        <a href="https://automata.tech/" target="_blank">
-          <img src={String(automataLogo)} className="logo automata" alt="Automata logo"/>
+    <Box height="100vh">
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <a href="https://automata.tech/" target="_blank" rel="noreferrer">
+          <img
+            src={String(automataLogo)}
+            className="logo automata"
+            alt="Automata logo"
+          />
         </a>
-      </div>
-      <h1>Frontend Exercise</h1>
-      <h2>Rock, Paper, Scissors, Lizard, Spock</h2>
-
-      <Box>
-        <Button>Play!</Button>
       </Box>
-    </>
-  )
+
+      <Welcome />
+
+      <Grid container spacing={2} sx={{ p: 2 }}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <GameArea />
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Scoreboard />
+          <Rules />
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }
 
-export default App
+export default App;
