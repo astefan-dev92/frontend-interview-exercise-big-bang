@@ -1,6 +1,8 @@
 # Automata Frontend Exercise
 ## Rock, Paper, Scissors, Lizard, Spock
 
+[![Watch the video](https://cdn.loom.com/sessions/thumbnails/673623199d3d4bbba955380361f391ae-with-play.jpg)](https://www.loom.com/share/673623199d3d4bbba955380361f391ae?sid=070ffeb9-c3cc-4cc0-8a50-c56ee4d9a429)
+
 ## Overview
 This is a modern take on the classic "Rock, Paper, Scissors" game, with two additional choices: **Lizard** and **Spock**.
 The extended rules create more possible outcomes, adding depth and strategy to the game.
