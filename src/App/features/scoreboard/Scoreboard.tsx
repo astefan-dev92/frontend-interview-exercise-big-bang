@@ -1,18 +1,36 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, Button, Box } from "@mui/material";
+
+import useGameStore from "../../store";
 
 const Scoreboard = () => {
+  const { player, wins, losses, resetScore } = useGameStore();
+
   return (
     <Card>
       <CardContent>
+        <Typography variant="h5" gutterBottom>
+          Welcome, {player}!
+        </Typography>
         <Typography variant="h6" gutterBottom>
           Scoreboard
         </Typography>
-        <Typography variant="body2">
-          Wins: 0 <br />
-          Losses: 0
-        </Typography>
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="body1">
+            Wins: {wins} <br />
+            Losses: {losses}
+          </Typography>
+        </Box>
+        <Button
+          variant="outlined"
+          color="secondary"
+          size="small"
+          onClick={resetScore}
+        >
+          Reset Score
+        </Button>
       </CardContent>
     </Card>
   );
 };
+
 export default Scoreboard;
