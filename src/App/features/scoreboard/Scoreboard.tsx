@@ -8,13 +8,15 @@ const Scoreboard = () => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Welcome, {player}!
-        </Typography>
+        {player && (
+          <Typography variant="h5" gutterBottom>
+            Welcome, {player}!
+          </Typography>
+        )}
         <Typography variant="h6" gutterBottom>
           Scoreboard
         </Typography>
-        <Box sx={{ mb: 2 }}>
+        <Box mb={2}>
           <Typography variant="body1">
             Wins: {wins} <br />
             Losses: {losses}

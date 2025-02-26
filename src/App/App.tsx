@@ -24,7 +24,7 @@ function App() {
 
       <Welcome />
 
-      <Grid container spacing={2} sx={{ p: 2 }}>
+      <Grid container spacing={2} p={2}>
         <Grid size={{ xs: 12, md: 8 }}>
           <GameArea />
         </Grid>

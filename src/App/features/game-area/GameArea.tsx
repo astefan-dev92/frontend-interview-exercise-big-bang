@@ -1,182 +1,99 @@
-import { useCallback, useEffect, useState } from "react";
+import { Box, Typography, Button } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
-import { Box, Fade, Button, keyframes } from "@mui/material";
+import { TokenGrid } from "./components/token-grid";
+import {
+  LizardToken,
+  PaperToken,
+  RockToken,
+  ScissorsToken,
+  SpockToken,
+} from "./components/tokens";
+import { getWinner, getWinnerMessage } from "./components/tokens/token-utils";
 
-import { tokens } from "./components/tokens";
+import { TokenColor, TokenType, WinnerType } from "./types";
 
 import useGameStore from "../../store";
 
-import { TokenType, WinnerType, TokenColor } from "./types";
-import { TokenGrid } from "./components/token-grid";
-
-const shakeAnimation = keyframes`
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-`;
-
-const sx = {
-  playAgainContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: "50%",
-    transform: "translateX(-50%)",
-  },
-  mainContainer: {
-    flex: 1,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-    position: "relative",
-  },
-};
-
-const rules = {
-  rock: [TokenType.SCISSORS, TokenType.LIZARD],
-  paper: [TokenType.ROCK, TokenType.SPOCK],
-  scissors: [TokenType.PAPER, TokenType.LIZARD],
-  lizard: [TokenType.PAPER, TokenType.SPOCK],
-  spock: [TokenType.ROCK, TokenType.SCISSORS],
+const tokenComponents = {
+  [TokenType.ROCK]: RockToken,
+  [TokenType.PAPER]: PaperToken,
+  [TokenType.SCISSORS]: ScissorsToken,
+  [TokenType.LIZARD]: LizardToken,
+  [TokenType.SPOCK]: SpockToken,
 };
 
 const GameArea = () => {
-  const {
-    playerMove,
-    computerMove,
-    roundEnded,
-    setRoundEnded,
-    setComputerMove,
-    resetMoves,
-    incrementWins,
-    incrementLosses,
-  } = useGameStore();
+  const { playerMove, computerMove, roundEnded, resetMoves, setRoundEnded } =
+    useGameStore();
 
-  const [showWinner, setShowWinner] = useState(false);
+  const PlayerToken = playerMove ? tokenComponents[playerMove] : null;
+  const ComputerToken = computerMove ? tokenComponents[computerMove] : null;
 
-  const computerChoice = useCallback(() => {
-    const choices: TokenType[] = Object.values(TokenType);
-    const randomIndex = Math.floor(Math.random() * choices.length);
-    return choices[randomIndex];
-  }, []);
+  const winner =
+    playerMove && computerMove ? getWinner(playerMove, computerMove) : null;
+  const resultMessage = winner ? getWinnerMessage(winner) : "";
 
-  const determineWinner = (player: TokenType, computer: TokenType) => {
-    if (!player || !computer) return null;
-
-    return rules[player].includes(computer)
-      ? WinnerType.PLAYER
-      : rules[computer].includes(player)
-      ? WinnerType.COMPUTER
-      : WinnerType.TIE;
-  };
-
-  const startNewRound = () => {
-    setRoundEnded(false);
+  const restartRound = () => {
     resetMoves();
+    setRoundEnded(false);
   };
-
-  const getTokenComponent = (type: TokenType, isComputer = false) => {
-    const token = tokens.find((t) => t.type === type);
-    if (!token) return null;
-    const TokenComponent = token.component;
-
-    const winner =
-      playerMove && computerMove
-        ? determineWinner(playerMove, computerMove)
-        : null;
-    const isWinner =
-      winner === (isComputer ? WinnerType.COMPUTER : WinnerType.PLAYER);
-
-    return (
-      <Box
-        sx={{
-          animation:
-            isWinner && showWinner
-              ? `${shakeAnimation} 0.5s ease-in-out infinite`
-              : "none",
-        }}
-      >
-        <TokenComponent color={isComputer ? TokenColor.RED : TokenColor.BLUE} />
-      </Box>
-    );
-  };
-
-  useEffect(() => {
-    startNewRound();
-  }, []);
-
-  useEffect(() => {
-    if (playerMove && !roundEnded) {
-      const timer = setTimeout(() => {
-        setComputerMove(computerChoice());
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [playerMove, roundEnded, computerChoice, setComputerMove]);
-
-  useEffect(() => {
-    if (!playerMove && !computerMove) {
-      setShowWinner(false);
-    }
-  }, [playerMove, computerMove]);
-
-  useEffect(() => {
-    if (computerMove) {
-      const timer = setTimeout(() => {
-        setShowWinner(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [computerMove]);
-
-  useEffect(() => {
-    if (playerMove && computerMove && !roundEnded) {
-      const result = determineWinner(playerMove, computerMove);
-      if (result === WinnerType.PLAYER) {
-        incrementWins();
-      } else if (result === WinnerType.COMPUTER) {
-        incrementLosses();
-      }
-      setRoundEnded(true);
-    }
-  }, [
-    playerMove,
-    computerMove,
-    roundEnded,
-    setRoundEnded,
-    incrementWins,
-    incrementLosses,
-  ]);
 
   return (
-    <Box display="flex" flexDirection="column" minHeight="100%">
-      <Box sx={sx.mainContainer}>
-        <Fade in={Boolean(playerMove)} timeout={500}>
-          <Box>{playerMove && getTokenComponent(playerMove)}</Box>
-        </Fade>
+    <Box>
+      <TokenGrid />
 
-        <Box
-          sx={{
-            typography: "h4",
-            visibility: playerMove ? "visible" : "hidden",
-          }}
-        >
-          VS
-        </Box>
+      {roundEnded && (
+        <>
+          <Typography
+            variant="h4"
+            align="center"
+            sx={{
+              my: 2,
+              color:
+                winner === WinnerType.PLAYER
+                  ? "success.main"
+                  : winner === WinnerType.COMPUTER
+                  ? "error.main"
+                  : "text.primary",
+            }}
+          >
+            {resultMessage}
+          </Typography>
 
-        <Fade in={Boolean(computerMove)} timeout={500}>
-          <Box>{computerMove && getTokenComponent(computerMove, true)}</Box>
-        </Fade>
+          <Grid
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Grid>
+              <Typography variant="h6" align="center" gutterBottom>
+                Your Move
+              </Typography>
+              {PlayerToken && <PlayerToken color={TokenColor.BLUE} />}
+            </Grid>
 
-        <Fade in={Boolean(playerMove && computerMove)} timeout={500}>
-          <Box sx={sx.playAgainContainer}>
-            <Button variant="contained" color="primary" onClick={startNewRound}>
+            <Grid>
+              <Typography variant="h6" align="center" gutterBottom>
+                Computer&apos;s Move
+              </Typography>
+              {ComputerToken && <ComputerToken color={TokenColor.RED} />}
+            </Grid>
+          </Grid>
+
+          <Box display="flex" justifyContent="center" mt={3}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={restartRound}
+              size="large"
+            >
               Play Again
             </Button>
           </Box>
-        </Fade>
-      </Box>
-      <TokenGrid />
+        </>
+      )}
     </Box>
   );
 };

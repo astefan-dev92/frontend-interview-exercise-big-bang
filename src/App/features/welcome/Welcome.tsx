@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useState } from "react";
 
 import {
   Box,
@@ -23,6 +23,12 @@ const Welcome = () => {
     setPlayer(event.target.value);
   };
 
+  const attemptSubmit = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter" && player) {
+      dismissDialog();
+    }
+  };
+
   const dismissDialog = () => setOpen(false);
 
   return (
@@ -32,14 +38,25 @@ const Welcome = () => {
         <Box>
           <Box>Let&apos;s play Rock, Paper, Scissors, Lizard, Spock!</Box>
           <Box mt={2}>
-            <TextField variant="outlined" onChange={setPlayerName} fullWidth />
+            <TextField
+              variant="outlined"
+              onChange={setPlayerName}
+              onKeyDown={attemptSubmit}
+              fullWidth
+            />
           </Box>
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button disabled={!player} onClick={dismissDialog} variant="contained">
-          Let&apos;s Play
-        </Button>
+        <Box display="flex" justifyContent="center" width="100%">
+          <Button
+            disabled={!player}
+            onClick={dismissDialog}
+            variant="contained"
+          >
+            Let&apos;s Play
+          </Button>
+        </Box>
       </DialogActions>
     </Dialog>
   );

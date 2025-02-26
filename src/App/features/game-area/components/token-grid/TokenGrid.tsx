@@ -1,21 +1,47 @@
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
-import { tokens } from "../tokens";
-
 import useGameStore from "../../../../store";
-import { TokenType } from "../../types";
+
+import { tokens, getWinner, getRandomToken } from "../tokens/token-utils";
+
+import { TokenType, WinnerType } from "../../types";
 
 const TokenGrid = () => {
-  const { playerMove, computerMove, setPlayerMove } = useGameStore();
+  const {
+    playerMove,
+    computerMove,
+    setPlayerMove,
+    setComputerMove,
+    incrementWins,
+    incrementLosses,
+    setRoundEnded,
+    resetMoves,
+  } = useGameStore();
 
   const selectToken = (type: TokenType) => {
-    if (playerMove || computerMove) return;
+    if (playerMove || computerMove) {
+      resetMoves();
+      setRoundEnded(false);
+      return;
+    }
+    
+    const computerChoice = getRandomToken();
     setPlayerMove(type);
+    setComputerMove(computerChoice);
+    
+    const winner = getWinner(type, computerChoice);
+    if (winner === WinnerType.PLAYER) {
+      incrementWins();
+    } else if (winner === WinnerType.COMPUTER) {
+      incrementLosses();
+    }
+    
+    setRoundEnded(true);
   };
 
   return (
-    <Grid container spacing={2} justifyContent="center" sx={{ p: 2 }}>
+    <Grid container spacing={2} justifyContent="center" p={2}>
       {tokens.map(({ type, component: TokenComponent }) => (
         <Grid key={type}>
           <Box
@@ -23,7 +49,7 @@ const TokenGrid = () => {
             sx={{
               opacity: playerMove ? 0.5 : 1,
               transition: "opacity 0.3s",
-              cursor: playerMove ? "default" : "pointer",
+              cursor: "pointer",
             }}
           >
             <TokenComponent />
@@ -33,4 +59,5 @@ const TokenGrid = () => {
     </Grid>
   );
 };
+
 export default TokenGrid;
